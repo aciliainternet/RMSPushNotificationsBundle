@@ -39,18 +39,32 @@ class AndroidNotification implements OSNotificationServiceInterface
     protected $authToken;
 
     /**
+     * Whether the fake server is enabled or not.
+     * @var bool
+     */
+    protected $fakeServerEnabled;
+
+    /**
+     * URL of the fake server
+     * @var string
+     */
+    protected $fakeServerUrl;
+
+    /**
      * Constructor
      *
      * @param $username
      * @param $password
      * @param $source
      */
-    public function __construct($username, $password, $source)
+    public function __construct($username, $password, $source, $fakeServerEnabled, $fakeServerUrl)
     {
         $this->username = $username;
         $this->password = $password;
         $this->source = $source;
         $this->authToken = "";
+        $this->fakeServerEnabled = $fakeServerEnabled;
+        $this->fakeServerUrl = $fakeServerUrl;
     }
 
     /**
@@ -61,7 +75,7 @@ class AndroidNotification implements OSNotificationServiceInterface
      * @throws \RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException
      * @return bool
      */
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message, array $extraOptions = [])
     {
         if (!$message instanceof AndroidMessage) {
             throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by C2DM", get_class($message)));

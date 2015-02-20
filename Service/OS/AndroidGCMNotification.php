@@ -50,18 +50,20 @@ class AndroidGCMNotification implements OSNotificationServiceInterface
     /**
      * Constructor
      *
-     * @param $apiKey
      * @param bool         $useMultiCurl
      * @param AbstractCurl $client       (optional)
      */
-    public function __construct($apiKey, $useMultiCurl, AbstractCurl $client = null)
+    public function __construct($useMultiCurl, $fakeServerEnabled, $fakeServerUrl, AbstractCurl $client = null)
     {
-        $this->apiKey = $apiKey;
         if (!$client) {
             $client = ($useMultiCurl ? new MultiCurl() : new Curl());
         }
         $this->browser = new Browser($client);
         $this->browser->getClient()->setVerifyPeer(false);
+
+        if (true === $this->fakeServerEnabled) {
+            $this->apiURL = $fakeServerUrl;
+        }
     }
 
     /**
@@ -71,13 +73,19 @@ class AndroidGCMNotification implements OSNotificationServiceInterface
      * @throws \RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException
      * @return bool
      */
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message, array $extraOptions = [])
     {
         if (!$message instanceof AndroidMessage) {
             throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by GCM", get_class($message)));
         }
         if (!$message->isGCM()) {
             throw new InvalidMessageTypeException("Non-GCM messages not supported by the Android GCM sender");
+        }
+
+        if (false === empty($extraOptions)) {
+            if (array_key_exists('api_key', $extraOptions)) {
+                $this->apiKey = $extraOptions['api_key'];
+            }
         }
 
         $headers = array(

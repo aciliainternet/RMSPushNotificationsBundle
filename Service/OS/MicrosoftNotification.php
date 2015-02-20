@@ -17,13 +17,27 @@ class MicrosoftNotification implements OSNotificationServiceInterface
      */
     protected $browser;
 
-    public function __construct()
+    /**
+     * Whether the fake server is enabled or not.
+     * @var bool
+     */
+    protected $fakeServerEnabled;
+
+    /**
+     * URL of the fake server
+     * @var string
+     */
+    protected $fakeServerUrl;
+
+    public function __construct($fakeServerEnabled, $fakeServerUrl)
     {
         $this->browser = new Browser(new Curl());
         $this->browser->getClient()->setVerifyPeer(false);
+        $this->fakeServerEnabled = $fakeServerEnabled;
+        $this->fakeServerUrl = $fakeServerUrl;
     }
 
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message, array $extraOptions = [])
     {
         if (!$message instanceof WindowsphoneMessage) {
             throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by MPNS", get_class($message)));
