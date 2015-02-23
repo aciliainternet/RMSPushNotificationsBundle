@@ -95,8 +95,8 @@ class AppleNotification implements OSNotificationServiceInterface
         $this->jsonUnescapedUnicode = $jsonUnescapedUnicode;
 
         if (true === $fakeServerEnabled) {
-            $this->apnURL = $fakeServerUrl;
-            $this->apnSandboxURL = $fakeServerUrl;
+            $this->apnURL = $fakeServerUrl . '/receive_apple.php';
+            $this->apnSandboxURL = $fakeServerUrl . '/receive_apple.php';
         }
     }
 
