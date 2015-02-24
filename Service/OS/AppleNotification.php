@@ -79,6 +79,7 @@ class AppleNotification implements OSNotificationServiceInterface
     protected $apnURL = "ssl://gateway.push.apple.com:2195";
     protected $apnSandboxURL = "ssl://gateway.sandbox.push.apple.com:2195";
 
+
     /**
      * Constructor
      *
@@ -95,8 +96,9 @@ class AppleNotification implements OSNotificationServiceInterface
         $this->jsonUnescapedUnicode = $jsonUnescapedUnicode;
 
         if (true === $fakeServerEnabled) {
-            $this->apnURL = $fakeServerUrl . '/receive_apple.php';
-            $this->apnSandboxURL = $fakeServerUrl . '/receive_apple.php';
+            $this->apnURL = preg_replace('/^http\:\/\//', 'tcp://', $fakeServerUrl) . ':80/receive_apple.php';
+            $this->apnSandboxURL = $this->apnURL;
+            $this->fakeServerEnabled = true;
         }
     }
 
@@ -193,6 +195,20 @@ class AppleNotification implements OSNotificationServiceInterface
      */
     protected function writeApnStream($apnURL, $payload)
     {
+        if (true === $this->fakeServerEnabled) {
+            // simulate it with a POST request
+            $ch = curl_init();
+
+            curl_setopt($ch,CURLOPT_URL, $apnURL);
+            curl_setopt($ch,CURLOPT_POST, 1);
+            curl_setopt($ch,CURLOPT_POSTFIELDS, [$payload]);
+
+            curl_exec($ch);
+            curl_close($ch);
+
+            return true;
+        }
+
         // Get the correct Apn stream and send data
         $fp = $this->getApnStream($apnURL);
         $response = (strlen($payload) === @fwrite($fp, $payload, strlen($payload)));
