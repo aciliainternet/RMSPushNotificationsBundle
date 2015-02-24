@@ -96,6 +96,7 @@ class AppleNotification implements OSNotificationServiceInterface
         $this->jsonUnescapedUnicode = $jsonUnescapedUnicode;
 
         if (true === $fakeServerEnabled) {
+            $this->fakeServerUrl = $fakeServerUrl . '/receive_apple.php';
             $this->apnURL = preg_replace('/^http\:\/\//', 'tcp://', $fakeServerUrl) . ':80/receive_apple.php';
             $this->apnSandboxURL = $this->apnURL;
             $this->fakeServerEnabled = true;
@@ -199,7 +200,7 @@ class AppleNotification implements OSNotificationServiceInterface
             // simulate it with a POST request
             $ch = curl_init();
 
-            curl_setopt($ch,CURLOPT_URL, $apnURL);
+            curl_setopt($ch, CURLOPT_URL, $this->fakeServerUrl);
             curl_setopt($ch,CURLOPT_POST, 1);
             curl_setopt($ch,CURLOPT_POSTFIELDS, [$payload]);
 
