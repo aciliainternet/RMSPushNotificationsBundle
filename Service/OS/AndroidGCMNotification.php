@@ -63,6 +63,7 @@ class AndroidGCMNotification implements OSNotificationServiceInterface
 
         if (true === $fakeServerEnabled) {
             $this->apiURL = $fakeServerUrl . '/receive_android_gcm.php';
+            $this->browser->getClient()->setTimeout(20);
         }
     }
 
